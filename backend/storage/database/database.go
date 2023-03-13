@@ -4,30 +4,38 @@ import (
 	"backend/models"
 	"backend/storage"
 	"database/sql"
+	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"log"
-	_ "modernc.org/sqlite"
+	"net"
 )
 
-type Database struct {
-	db *sql.DB
+type database struct {
+	*sql.DB
 }
 
-func New(path string) (storage.Storage, error) {
-	db, err := sql.Open("sqlite", path)
+func New(address net.IP, username, password, databaseName string) (storage.Storage, error) {
+	var err error
+
+	dsn := fmt.Sprintf(
+		"%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local",
+		username, password, address, databaseName,
+	)
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-		return Database{}, err
+		return nil, err
 	}
 
-	return Database{db}, nil
+	return database{db}, nil
 }
 
-func (database Database) AddQuote(quote models.Quote) (models.QuoteId, error) {
+func (db database) AddQuote(quote models.Quote) (models.QuoteId, error) {
 	statement := `
-		INSERT INTO Quotes 
-	    (Text, Author, Created) VALUES (?, ?, ?)
+		INSERT INTO quotes
+	    (text, author) VALUES (?, ?)
 		RETURNING Id
     `
-	row := database.db.QueryRow(statement, quote.Text, quote.Author, quote.Created)
+	row := db.QueryRow(statement, quote.Text, quote.Author)
 
 	var nextId models.QuoteId
 	err := row.Scan(&nextId)
@@ -38,19 +46,19 @@ func (database Database) AddQuote(quote models.Quote) (models.QuoteId, error) {
 	return nextId, nil
 }
 
-func (database Database) GetSingleQuote(id models.QuoteId) (models.Quote, error) {
+func (db database) GetSingleQuote(id models.QuoteId) (models.Quote, error) {
 	statement := `
 		SELECT * 
 		FROM Quotes 
 		WHERE id = ?
 	`
-	row := database.db.QueryRow(statement, id)
+	row := db.QueryRow(statement, id)
 
 	return readQuote(row)
 }
 
-func (database Database) GetAllQuotes() ([]models.Quote, error) {
-	count, err := database.getNumberOfQuotes()
+func (db database) GetAllQuotes() ([]models.Quote, error) {
+	count, err := db.getNumberOfQuotes()
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +71,7 @@ func (database Database) GetAllQuotes() ([]models.Quote, error) {
 		SELECT * 
 		FROM Quotes
 	`
-	rows, err := database.db.Query(statement)
+	rows, err := db.Query(statement)
 	if err != nil {
 		return nil, err
 	}
@@ -82,32 +90,32 @@ func (database Database) GetAllQuotes() ([]models.Quote, error) {
 	return quotes, nil
 }
 
-func (database Database) IncrementQuoteLikes(id models.QuoteId) (models.Quote, error) {
+func (db database) IncrementQuoteLikes(id models.QuoteId) (models.Quote, error) {
 	statement := `
 		UPDATE Quotes
 		SET Likes = Likes + 1
 		WHERE id = ?
 		RETURNING *
 	`
-	row := database.db.QueryRow(statement, id)
+	row := db.QueryRow(statement, id)
 
 	return readQuote(row)
 }
 
-func (database Database) IncrementQuoteDislikes(id models.QuoteId) (models.Quote, error) {
+func (db database) IncrementQuoteDislikes(id models.QuoteId) (models.Quote, error) {
 	statement := `
 		UPDATE Quotes
 		SET Dislikes = Dislikes + 1
 		WHERE id = ?
 		RETURNING *
 	`
-	row := database.db.QueryRow(statement, id)
+	row := db.QueryRow(statement, id)
 
 	return readQuote(row)
 }
 
-func (database Database) Close() {
-	err := database.db.Close()
+func (db database) Close() {
+	err := db.DB.Close()
 	if err != nil {
 		log.Panicln(err)
 	}

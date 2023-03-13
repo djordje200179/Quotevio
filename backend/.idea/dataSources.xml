@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="Database" uuid="312ec4c0-9262-44d3-b2f7-327de02efcb7">
-      <driver-ref>sqlite.xerial</driver-ref>
+    <data-source source="LOCAL" name="Pi Zero" uuid="6d6cb251-7e3c-4090-98bd-9cbef5d3831b">
+      <driver-ref>mariadb</driver-ref>
       <synchronize>true</synchronize>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/database.sqlite</jdbc-url>
+      <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mariadb://192.168.1.26:3306/quotevio</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
-      <driver-properties>
-        <property name="date_precision" value="SECONDS" />
-      </driver-properties>
     </data-source>
   </component>
 </project>

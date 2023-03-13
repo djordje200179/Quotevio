@@ -4,6 +4,7 @@ import (
 	"backend/server"
 	"backend/storage/database"
 	"log"
+	"net"
 )
 
 func main() {
@@ -14,7 +15,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	db, err := database.New("./database.sqlite")
+	db, err := database.New(
+		net.IPv4(192, 168, 1, 26),
+		"djordje200179", "Djole2001",
+		"quotevio",
+	)
 	if err != nil {
 		log.Fatal(err)
 	}

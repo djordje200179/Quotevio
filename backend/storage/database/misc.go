@@ -20,12 +20,12 @@ func readQuote(row *sql.Row) (models.Quote, error) {
 	return quote, nil
 }
 
-func (database Database) getNumberOfQuotes() (uint, error) {
+func (db database) getNumberOfQuotes() (uint, error) {
 	statement := `
 		SELECT COUNT(*) 
-		FROM Quotes
+		FROM quotes
 	`
-	row := database.db.QueryRow(statement)
+	row := db.QueryRow(statement)
 
 	var count uint
 	err := row.Scan(&count)
