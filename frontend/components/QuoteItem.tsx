@@ -1,0 +1,47 @@
+import { Quote } from "../models";
+import { Card, Paragraph, Text } from "react-native-paper";
+import { StyleSheet, View } from "react-native";
+import QuoteActions from "./QuoteActions";
+
+interface Props {
+	quote: Quote;
+}
+
+const styles = StyleSheet.create({
+	card: {
+		margin: 5
+	},
+	infoText: {
+		fontSize: 12,
+		fontStyle: "italic",
+		textAlign: "right",
+		textAlignVertical: "bottom"
+	},
+	bottom: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		marginTop: 10
+	},
+});
+
+export default function QuoteItem({ quote }: Props) {
+	return (
+		<Card style={styles.card}>
+			<Card.Content>
+				<View>
+					<Paragraph>{quote.text}</Paragraph>
+
+					<View style={styles.bottom}>
+						<QuoteActions quote={quote} />
+
+						<View>
+							<Text style={styles.infoText}>{quote.author}</Text>
+							<Text style={styles.infoText}>22.08.2022.</Text>
+						</View>
+
+					</View>
+				</View>
+			</Card.Content>
+		</Card>
+	);
+}
