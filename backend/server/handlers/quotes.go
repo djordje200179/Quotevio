@@ -34,20 +34,15 @@ var quoteAddingParamsMissingError = errors.New("text and author are required")
 var quoteIdParamError = errors.New("id must be an integer")
 
 func (handler *QuotesHandler) AddQuote(context *gin.Context) {
-	text := context.PostForm("text")
-	author := context.PostForm("author")
+	var quote entities.Quote
 
-	if text == "" || author == "" {
+	err := context.ShouldBindJSON(&quote)
+	if err != nil {
 		returnError(context, quoteAddingParamsMissingError, http.StatusBadRequest)
 		return
 	}
 
-	quote := entities.Quote{
-		Text:   text,
-		Author: author,
-	}
-
-	_, err := handler.storage.CreateQuote(quote)
+	_, err = handler.storage.CreateQuote(quote)
 	if err != nil {
 		returnServerError(context, err)
 		return
