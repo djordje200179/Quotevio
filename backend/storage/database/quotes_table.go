@@ -39,21 +39,20 @@ func (db database) getNumberOfQuotes() (uint, error) {
 	return count, nil
 }
 
-func (db database) CreateQuote(quote entities.Quote) (uint, error) {
+func (db database) CreateQuote(quote entities.Quote) (entities.Quote, error) {
 	statement := `
 		INSERT INTO quotes
 	    (text, author) VALUES (?, ?)
-		RETURNING Id
+		RETURNING *
     `
 	row := db.QueryRow(statement, quote.Text, quote.Author)
 
-	var quoteId uint
-	err := row.Scan(&quoteId)
+	err := readQuote(row, &quote)
 	if err != nil {
-		return 0, err
+		return entities.Quote{}, err
 	}
 
-	return quoteId, nil
+	return quote, nil
 }
 
 func (db database) GetSingleQuote(id uint) (entities.Quote, error) {
@@ -107,32 +106,48 @@ func (db database) GetAllQuotes() ([]entities.Quote, error) {
 	return quotes, nil
 }
 
-func (db database) IncrementQuoteLikes(id uint) error {
+func (db database) IncrementQuoteLikes(id uint) (entities.Quote, error) {
 	statement := `
 		UPDATE quotes
 		SET likes = likes + 1
 		WHERE id = ?
+		RETURNING *
 	`
 
-	_, err := db.Exec(statement, id)
+	row := db.QueryRow(statement, id)
+
+	var quote entities.Quote
+	err := readQuote(row, &quote)
 	if err != nil {
-		return err
+		if err == sql.ErrNoRows {
+			err = storage.QuoteNotFoundError
+		}
+
+		return entities.Quote{}, err
 	}
 
-	return err
+	return quote, nil
 }
 
-func (db database) IncrementQuoteDislikes(id uint) error {
+func (db database) IncrementQuoteDislikes(id uint) (entities.Quote, error) {
 	statement := `
 		UPDATE quotes
 		SET dislikes = dislikes + 1
 		WHERE id = ?
+		RETURNING *
 	`
 
-	_, err := db.Exec(statement, id)
+	row := db.QueryRow(statement, id)
+
+	var quote entities.Quote
+	err := readQuote(row, &quote)
 	if err != nil {
-		return err
+		if err == sql.ErrNoRows {
+			err = storage.QuoteNotFoundError
+		}
+
+		return entities.Quote{}, err
 	}
 
-	return err
+	return quote, nil
 }

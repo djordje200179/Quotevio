@@ -42,13 +42,13 @@ func (handler *QuotesHandler) AddQuote(context *gin.Context) {
 		return
 	}
 
-	_, err = handler.storage.CreateQuote(quote)
+	quote, err = handler.storage.CreateQuote(quote)
 	if err != nil {
 		returnServerError(context, err)
 		return
 	}
 
-	context.Status(http.StatusCreated)
+	context.JSON(http.StatusCreated, quote)
 }
 
 func (handler *QuotesHandler) GetAllQuotes(context *gin.Context) {
@@ -93,7 +93,7 @@ func (handler *QuotesHandler) LikeQuote(context *gin.Context) {
 		return
 	}
 
-	err = handler.storage.IncrementQuoteLikes(uint(id))
+	quote, err := handler.storage.IncrementQuoteLikes(uint(id))
 	if err != nil {
 		if err == storage.QuoteNotFoundError {
 			context.Status(http.StatusNotFound)
@@ -104,7 +104,7 @@ func (handler *QuotesHandler) LikeQuote(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, "OK")
+	context.JSON(http.StatusOK, quote)
 }
 
 func (handler *QuotesHandler) DislikeQuote(context *gin.Context) {
@@ -116,7 +116,7 @@ func (handler *QuotesHandler) DislikeQuote(context *gin.Context) {
 		return
 	}
 
-	err = handler.storage.IncrementQuoteDislikes(uint(id))
+	quote, err := handler.storage.IncrementQuoteDislikes(uint(id))
 	if err != nil {
 		if err == storage.QuoteNotFoundError {
 			context.Status(http.StatusNotFound)
@@ -127,5 +127,5 @@ func (handler *QuotesHandler) DislikeQuote(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, "OK")
+	context.JSON(http.StatusOK, quote)
 }
