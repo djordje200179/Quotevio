@@ -111,22 +111,14 @@ func (db database) IncrementQuoteLikes(id uint) (entities.Quote, error) {
 		UPDATE quotes
 		SET likes = likes + 1
 		WHERE id = ?
-		RETURNING *
 	`
 
-	row := db.QueryRow(statement, id)
-
-	var quote entities.Quote
-	err := readQuote(row, &quote)
+	_, err := db.Exec(statement, id)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			err = storage.QuoteNotFoundError
-		}
-
 		return entities.Quote{}, err
 	}
 
-	return quote, nil
+	return db.GetSingleQuote(id)
 }
 
 func (db database) IncrementQuoteDislikes(id uint) (entities.Quote, error) {
@@ -134,20 +126,12 @@ func (db database) IncrementQuoteDislikes(id uint) (entities.Quote, error) {
 		UPDATE quotes
 		SET dislikes = dislikes + 1
 		WHERE id = ?
-		RETURNING *
 	`
 
-	row := db.QueryRow(statement, id)
-
-	var quote entities.Quote
-	err := readQuote(row, &quote)
+	_, err := db.Exec(statement, id)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			err = storage.QuoteNotFoundError
-		}
-
 		return entities.Quote{}, err
 	}
 
-	return quote, nil
+	return db.GetSingleQuote(id)
 }
