@@ -1,20 +1,18 @@
 package storage
 
 import (
-	"backend/models"
+	"backend/storage/entities"
 	"errors"
 )
 
 var QuoteNotFoundError = errors.New("quote not found")
 
 type Storage interface {
-	AddQuote(quote models.Quote) (models.QuoteId, error)
-
-	GetSingleQuote(id models.QuoteId) (models.Quote, error)
-	GetAllQuotes() ([]models.Quote, error)
-
-	IncrementQuoteLikes(id models.QuoteId) (models.Quote, error)
-	IncrementQuoteDislikes(id models.QuoteId) (models.Quote, error)
+	CreateQuote(quote entities.Quote) (uint, error)
+	GetSingleQuote(id uint) (entities.Quote, error)
+	GetAllQuotes() ([]entities.Quote, error)
+	IncrementQuoteLikes(id uint) error
+	IncrementQuoteDislikes(id uint) error
 
 	Close()
 }

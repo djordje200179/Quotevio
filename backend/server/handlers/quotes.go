@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"backend/models"
 	st "backend/storage"
+	models2 "backend/storage/entities"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -33,15 +33,15 @@ func addQuote(context *gin.Context) {
 		return
 	}
 
-	quote := models.Quote{
+	quote := models2.Quote{
 		Text:    text,
 		Author:  author,
-		Created: models.Today(),
+		Created: models2.Today(),
 	}
 
 	storage := getStorage(context)
 
-	id, err := storage.AddQuote(quote)
+	id, err := storage.CreateQuote(quote)
 	if err != nil {
 		returnServerError(context, err)
 		return
@@ -74,7 +74,7 @@ func getSingleQuote(context *gin.Context) {
 
 	storage := getStorage(context)
 
-	quote, err := storage.GetSingleQuote(models.QuoteId(id))
+	quote, err := storage.GetSingleQuote(models2.QuoteId(id))
 	if err != nil {
 		if err == st.QuoteNotFoundError {
 			context.Status(http.StatusNotFound)
@@ -99,12 +99,12 @@ func applyActionOnQuote(context *gin.Context) {
 
 	storage := getStorage(context)
 
-	var quote models.Quote
+	var quote models2.Quote
 	switch action {
 	case "like":
-		quote, err = storage.IncrementQuoteLikes(models.QuoteId(id))
+		quote, err = storage.IncrementQuoteLikes(models2.QuoteId(id))
 	case "dislike":
-		quote, err = storage.IncrementQuoteDislikes(models.QuoteId(id))
+		quote, err = storage.IncrementQuoteDislikes(models2.QuoteId(id))
 	default:
 		returnError(context, quoteActionParamError, http.StatusBadRequest)
 		return

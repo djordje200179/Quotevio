@@ -1,9 +1,7 @@
-package models
-
-type QuoteId uint64
+package entities
 
 type Quote struct {
-	Id QuoteId `json:"id"`
+	Id uint `json:"id"`
 
 	Text   string `json:"text"`
 	Author string `json:"author"`

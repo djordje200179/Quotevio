@@ -1,4 +1,4 @@
-package models
+package entities
 
 import (
 	"database/sql/driver"
@@ -11,7 +11,9 @@ type Date struct {
 	Year  uint16 `json:"year"`
 }
 
-func Today() Date { return DateFromTimestamp(time.Now()) }
+func Today() Date {
+	return DateFromTimestamp(time.Now())
+}
 
 func DateFromTimestamp(time time.Time) Date {
 	return Date{
