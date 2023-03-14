@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	st "backend/storage"
+	"backend/storage"
 	"backend/storage/entities"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -9,22 +9,32 @@ import (
 	"strconv"
 )
 
+type QuotesHandler struct {
+	storage storage.Storage
+}
+
+func NewQuotesHandler(storage storage.Storage, engine *gin.Engine) *QuotesHandler {
+	handler := &QuotesHandler{
+		storage: storage,
+	}
+
+	group := engine.Group("/quotes")
+
+	group.POST("/", handler.AddQuote)
+
+	group.GET("/", handler.GetAllQuotes)
+	group.GET("/:id", handler.GetSingleQuote)
+
+	group.PUT("/:id", handler.ApplyActionOnQuote)
+
+	return handler
+}
+
 var quoteAddingParamsMissingError = errors.New("text and author are required")
 var quoteIdParamError = errors.New("id must be an integer")
 var quoteActionParamError = errors.New("valid action is required")
 
-func RegisterQuotes(engine *gin.Engine) {
-	group := engine.Group("/quotes")
-
-	group.POST("/", addQuote)
-
-	group.GET("/", getAllQuotes)
-	group.GET("/:id", getSingleQuote)
-
-	group.PUT("/:id", applyActionOnQuote)
-}
-
-func addQuote(context *gin.Context) {
+func (handler *QuotesHandler) AddQuote(context *gin.Context) {
 	text := context.PostForm("text")
 	author := context.PostForm("author")
 
@@ -34,27 +44,21 @@ func addQuote(context *gin.Context) {
 	}
 
 	quote := entities.Quote{
-		Text:    text,
-		Author:  author,
-		Created: entities.Today(),
+		Text:   text,
+		Author: author,
 	}
 
-	storage := getStorage(context)
-
-	id, err := storage.CreateQuote(quote)
+	_, err := handler.storage.CreateQuote(quote)
 	if err != nil {
 		returnServerError(context, err)
 		return
 	}
 
-	context.Header("Location", "/quotes/"+strconv.FormatUint(uint64(id), 10))
 	context.Status(http.StatusCreated)
 }
 
-func getAllQuotes(context *gin.Context) {
-	storage := getStorage(context)
-
-	quotes, err := storage.GetAllQuotes()
+func (handler *QuotesHandler) GetAllQuotes(context *gin.Context) {
+	quotes, err := handler.storage.GetAllQuotes()
 	if err != nil {
 		returnServerError(context, err)
 		return
@@ -63,7 +67,7 @@ func getAllQuotes(context *gin.Context) {
 	context.JSON(http.StatusOK, quotes)
 }
 
-func getSingleQuote(context *gin.Context) {
+func (handler *QuotesHandler) GetSingleQuote(context *gin.Context) {
 	rawId := context.Param("id")
 
 	id, err := strconv.ParseUint(rawId, 10, 64)
@@ -72,11 +76,9 @@ func getSingleQuote(context *gin.Context) {
 		return
 	}
 
-	storage := getStorage(context)
-
-	quote, err := storage.GetSingleQuote(uint(id))
+	quote, err := handler.storage.GetSingleQuote(uint(id))
 	if err != nil {
-		if err == st.QuoteNotFoundError {
+		if err == storage.QuoteNotFoundError {
 			context.Status(http.StatusNotFound)
 		} else {
 			returnError(context, err, http.StatusInternalServerError)
@@ -88,7 +90,7 @@ func getSingleQuote(context *gin.Context) {
 	context.JSON(http.StatusOK, quote)
 }
 
-func applyActionOnQuote(context *gin.Context) {
+func (handler *QuotesHandler) ApplyActionOnQuote(context *gin.Context) {
 	action := context.Query("action")
 	rawId := context.Param("id")
 
@@ -97,21 +99,19 @@ func applyActionOnQuote(context *gin.Context) {
 		returnError(context, quoteIdParamError, http.StatusBadRequest)
 	}
 
-	storage := getStorage(context)
-
 	var quote entities.Quote
 	switch action {
 	case "like":
-		err = storage.IncrementQuoteLikes(uint(id))
+		err = handler.storage.IncrementQuoteLikes(uint(id))
 	case "dislike":
-		err = storage.IncrementQuoteDislikes(uint(id))
+		err = handler.storage.IncrementQuoteDislikes(uint(id))
 	default:
 		returnError(context, quoteActionParamError, http.StatusBadRequest)
 		return
 	}
 
 	if err != nil {
-		if err == st.QuoteNotFoundError {
+		if err == storage.QuoteNotFoundError {
 			context.Status(http.StatusNotFound)
 		} else {
 			returnError(context, err, http.StatusInternalServerError)

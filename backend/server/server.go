@@ -19,11 +19,7 @@ func newEngine(storage storage.Storage) *gin.Engine {
 	engine.Use(gin.LoggerWithFormatter(logger))
 	engine.Use(gin.Recovery())
 
-	engine.Use(func(c *gin.Context) {
-		c.Set("storage", storage)
-	})
-
-	handlers.RegisterQuotes(engine)
+	handlers.NewQuotesHandler(storage, engine)
 
 	return engine
 }
