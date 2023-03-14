@@ -20,19 +20,18 @@ func NewQuotesHandler(storage storage.Storage, engine *gin.Engine) *QuotesHandle
 
 	group := engine.Group("/quotes")
 
+	group.GET("/", handler.GetAllQuotes)
 	group.POST("/", handler.AddQuote)
 
-	group.GET("/", handler.GetAllQuotes)
 	group.GET("/:id", handler.GetSingleQuote)
-
-	group.PUT("/:id", handler.ApplyActionOnQuote)
+	group.POST("/:id/like", handler.LikeQuote)
+	group.POST("/:id/dislike", handler.DislikeQuote)
 
 	return handler
 }
 
 var quoteAddingParamsMissingError = errors.New("text and author are required")
 var quoteIdParamError = errors.New("id must be an integer")
-var quoteActionParamError = errors.New("valid action is required")
 
 func (handler *QuotesHandler) AddQuote(context *gin.Context) {
 	text := context.PostForm("text")
@@ -90,26 +89,16 @@ func (handler *QuotesHandler) GetSingleQuote(context *gin.Context) {
 	context.JSON(http.StatusOK, quote)
 }
 
-func (handler *QuotesHandler) ApplyActionOnQuote(context *gin.Context) {
-	action := context.Query("action")
+func (handler *QuotesHandler) LikeQuote(context *gin.Context) {
 	rawId := context.Param("id")
 
 	id, err := strconv.ParseUint(rawId, 10, 64)
 	if err != nil {
 		returnError(context, quoteIdParamError, http.StatusBadRequest)
-	}
-
-	var quote entities.Quote
-	switch action {
-	case "like":
-		err = handler.storage.IncrementQuoteLikes(uint(id))
-	case "dislike":
-		err = handler.storage.IncrementQuoteDislikes(uint(id))
-	default:
-		returnError(context, quoteActionParamError, http.StatusBadRequest)
 		return
 	}
 
+	err = handler.storage.IncrementQuoteLikes(uint(id))
 	if err != nil {
 		if err == storage.QuoteNotFoundError {
 			context.Status(http.StatusNotFound)
@@ -120,5 +109,28 @@ func (handler *QuotesHandler) ApplyActionOnQuote(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, quote)
+	context.JSON(http.StatusOK, "OK")
+}
+
+func (handler *QuotesHandler) DislikeQuote(context *gin.Context) {
+	rawId := context.Param("id")
+
+	id, err := strconv.ParseUint(rawId, 10, 64)
+	if err != nil {
+		returnError(context, quoteIdParamError, http.StatusBadRequest)
+		return
+	}
+
+	err = handler.storage.IncrementQuoteDislikes(uint(id))
+	if err != nil {
+		if err == storage.QuoteNotFoundError {
+			context.Status(http.StatusNotFound)
+		} else {
+			returnError(context, err, http.StatusInternalServerError)
+		}
+
+		return
+	}
+
+	context.JSON(http.StatusOK, "OK")
 }
