@@ -32,18 +32,26 @@ export default function QuoteActions({ quote }: Props) {
 	const [disliked, setDisliked] = useState(false);
 
 	function like() {
-		const url = `http://localhost:3000/quotes/${quote.id}/like`;
+		const url = `http://192.168.1.26:8080/quotes/${quote.id}/like`;
 
 		fetch(url, { method: "POST" })
-			.then(() => setLiked(true))
+			.then(response=>response.json())
+			.then(quote => {
+				setLiked(true);
+				console.log(quote);
+			})
 			.catch(console.log);
 	}
 
 	function dislike() {
-		const url = `http://localhost:3000/quotes/${quote.id}/dislike`;
+		const url = `http://192.168.1.26:8080/quotes/${quote.id}/dislike`;
 
 		fetch(url, { method: "POST" })
-			.then(() => setDisliked(true))
+			.then(response=>response.json())
+			.then(quote => {
+				setDisliked(true);
+				console.log(quote);
+			})
 			.catch(console.log);
 	}
 
