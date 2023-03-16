@@ -16,6 +16,7 @@ export default function QuoteList({quotes, refreshing, onRefresh, onQuoteUpdate}
         <FlatList data={quotes}
                   renderItem={({item}) => <QuoteItem quote={item} onQuoteUpdate={onQuoteUpdate}/>}
                   keyExtractor={item => item.id}
-                  refreshControl={refreshControl}/>
+                  refreshControl={refreshControl}
+                  contentContainerStyle={{ flexGrow: 1 }}/>
     );
 }

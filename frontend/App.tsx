@@ -50,14 +50,12 @@ export default function App() {
 			<Searchbar placeholder="Search quotes"
 			           value={searchQuery} onChangeText={setSearchQuery}/>
 
-			<View>
-				{refreshing ? <ActivityIndicator/> : null}
+			{refreshing ? <ActivityIndicator/> : null}
 
-				<QuoteList quotes={filteredQuotes}
-						   refreshing={refreshing} onRefresh={loadData}
-						   onQuoteUpdate={updateQuote}
-				/>
-			</View>
+			<QuoteList quotes={filteredQuotes}
+					   refreshing={refreshing} onRefresh={loadData}
+					   onQuoteUpdate={updateQuote}
+			/>
 
 			<FAB icon="plus" color={DefaultTheme.colors.inversePrimary}
 			     size="medium" style={styles.fab}
