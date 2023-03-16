@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
 export default function App() {
 	const [searchQuery, setSearchQuery] = useState("");
 
-	const { isLoading: quotesLoading, data: allQuotes } = useFetch<Quote[]>("http://192.168.1.3:80/quotes");
+	const { isLoading: quotesLoading, data: allQuotes } = useFetch<Quote[]>("http://192.168.1.26:8080/quotes");
 
 	const filteredQuotes = useMemo(
 		() => allQuotes?.filter(quote => quote.text.includes(searchQuery)),

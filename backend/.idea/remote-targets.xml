@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteTargetsManager">
+    <targets>
+      <target name="Pi Zero" type="ssh/sftp" uuid="3c5b6402-d290-4bd5-96d1-60e4d7fea4ab">
+        <config>
+          <option name="projectRootOnTarget" value="/home/pi/Quotevio" />
+          <option name="serverName" value="Pi Zero" />
+        </config>
+        <ContributedStateBase type="GoLanguageRuntime">
+          <config />
+        </ContributedStateBase>
+      </target>
+    </targets>
+  </component>
+</project>

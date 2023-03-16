@@ -25,7 +25,7 @@ func main() {
 	}
 	defer db.Close()
 
-	srv := server.New(db, 80)
+	srv := server.New(db, 8080)
 
 	err = srv.Start()
 	if err != nil {
