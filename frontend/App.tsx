@@ -23,7 +23,12 @@ export default function App() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [allQuotes, setAllQuotes] = useState<Quote[]>([]);
 
-	const loadData = () => {
+	function updateQuote(quote: Quote) {
+		const newQuotes = allQuotes.map(currQuote => currQuote.id === quote.id ? quote : currQuote);
+		setAllQuotes(newQuotes);
+	}
+
+	function loadData() {
 		fetch("http://192.168.1.26:8080/quotes")
 			.then((response) => response.json())
 			.then(quotes => {
@@ -48,7 +53,10 @@ export default function App() {
 			<View>
 				{refreshing ? <ActivityIndicator/> : null}
 
-				<QuoteList quotes={filteredQuotes} refreshing={refreshing} onRefresh={loadData}/>
+				<QuoteList quotes={filteredQuotes}
+						   refreshing={refreshing} onRefresh={loadData}
+						   onQuoteUpdate={updateQuote}
+				/>
 			</View>
 
 			<FAB icon="plus" color={DefaultTheme.colors.inversePrimary}

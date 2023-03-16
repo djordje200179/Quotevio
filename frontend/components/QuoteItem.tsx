@@ -5,6 +5,7 @@ import QuoteActions from "./QuoteActions";
 
 interface Props {
 	quote: Quote;
+	onQuoteUpdate: (quote: Quote) => void;
 }
 
 const styles = StyleSheet.create({
@@ -24,7 +25,7 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default function QuoteItem({ quote }: Props) {
+export default function QuoteItem({ quote, onQuoteUpdate }: Props) {
 	return (
 		<Card style={styles.card}>
 			<Card.Content>
@@ -32,7 +33,7 @@ export default function QuoteItem({ quote }: Props) {
 					<Paragraph>{quote.text}</Paragraph>
 
 					<View style={styles.bottom}>
-						<QuoteActions quote={quote} />
+						<QuoteActions quote={quote} onQuoteUpdate={onQuoteUpdate} />
 
 						<View>
 							<Text style={styles.infoText}>{quote.author}</Text>

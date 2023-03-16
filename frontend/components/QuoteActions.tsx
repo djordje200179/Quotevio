@@ -5,6 +5,7 @@ import { useState } from "react";
 
 interface Props {
 	quote: Quote;
+	onQuoteUpdate: (quote: Quote) => void;
 }
 
 const styles = StyleSheet.create({
@@ -27,7 +28,7 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default function QuoteActions({ quote }: Props) {
+export default function QuoteActions({ quote, onQuoteUpdate }: Props) {
 	const [liked, setLiked]       = useState(false);
 	const [disliked, setDisliked] = useState(false);
 
@@ -36,11 +37,11 @@ export default function QuoteActions({ quote }: Props) {
 
 		fetch(url, { method: "POST" })
 			.then(response=>response.json())
-			.then(quote => {
+			.then(newQuote => {
 				setLiked(true);
-				console.log(quote);
+				onQuoteUpdate(newQuote);
 			})
-			.catch(console.log);
+			.catch(console.error);
 	}
 
 	function dislike() {
@@ -48,11 +49,11 @@ export default function QuoteActions({ quote }: Props) {
 
 		fetch(url, { method: "POST" })
 			.then(response=>response.json())
-			.then(quote => {
+			.then(newQuote => {
 				setDisliked(true);
-				console.log(quote);
+				onQuoteUpdate(newQuote);
 			})
-			.catch(console.log);
+			.catch(console.error);
 	}
 
 	return (
