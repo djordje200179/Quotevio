@@ -23,8 +23,8 @@ func QuotesMux(db db.DB) *http.ServeMux {
 	ctrl.HandleFunc("GET /", ctrl.getQuotes)
 	ctrl.HandleFunc("GET /{id}", ctrl.getQuote)
 	ctrl.HandleFunc("POST /", ctrl.createQuote)
-	ctrl.HandleFunc("POST /{id}/like", ctrl.likeQuote)
-	ctrl.HandleFunc("POST /{id}/dislike", ctrl.dislikeQuote)
+	ctrl.HandleFunc("PATCH /{id}/like", ctrl.likeQuote)
+	ctrl.HandleFunc("PATCH /{id}/dislike", ctrl.dislikeQuote)
 
 	return ctrl.ServeMux
 }
