@@ -19,7 +19,7 @@ func timestamp(w http.ResponseWriter, r *http.Request) {
 func HealthMux() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/ping", ping)
+	mux.HandleFunc("GET /ping", ping)
 	mux.HandleFunc("GET /timestamp", timestamp)
 
 	return mux

@@ -1,4 +1,4 @@
-package database
+package db
 
 import (
 	"database/sql"
@@ -12,12 +12,12 @@ type DB struct {
 	logger *log.Logger
 }
 
-func New(host, username, password, databaseName string, logger *log.Logger) (DB, error) {
+func New(host, username, password, dbName string, logger *log.Logger) (DB, error) {
 	var err error
 
 	dsn := fmt.Sprintf(
 		"%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local",
-		username, password, host, databaseName,
+		username, password, host, dbName,
 	)
 	conn, err := sql.Open("mysql", dsn)
 	if err != nil {

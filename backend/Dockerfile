@@ -9,5 +9,10 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/app ./cmd
 
 FROM scratch AS exec
+
 COPY --from=build /bin/app /bin/app
+
+HEALTHCHECK --interval=3s --timeout=3s --retries=10 \
+  CMD curl -f -s http://localhost:8080/health/ping || exit 1
+
 ENTRYPOINT ["/bin/app"]

@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"backend/database"
+	"backend/db"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -9,13 +9,14 @@ import (
 )
 
 type quotesController struct {
-	db database.DB
+	db db.DB
 	*http.ServeMux
 }
 
-func QuotesMux(db database.DB) *http.ServeMux {
+func QuotesMux(db db.DB) *http.ServeMux {
 	ctrl := &quotesController{
-		db:       db,
+		db: db,
+
 		ServeMux: http.NewServeMux(),
 	}
 
@@ -29,7 +30,7 @@ func QuotesMux(db database.DB) *http.ServeMux {
 }
 
 func (ctrl *quotesController) getAllQuotes(w http.ResponseWriter, r *http.Request) {
-	quotes, err := ctrl.db.GetAllQuotes()
+	quotes, err := ctrl.db.GetQuotes()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -49,10 +50,10 @@ func (ctrl *quotesController) getQuote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	quote, err := ctrl.db.GetSingleQuote(uint(id))
+	quote, err := ctrl.db.GetQuote(uint(id))
 	if err != nil {
 		var statusCode int
-		if errors.Is(err, database.ErrQuoteNotFound) {
+		if errors.Is(err, db.ErrQuoteNotFound) {
 			statusCode = http.StatusNotFound
 		} else {
 			statusCode = http.StatusInternalServerError
@@ -97,7 +98,7 @@ func (ctrl *quotesController) likeQuote(w http.ResponseWriter, r *http.Request) 
 	quote, err := ctrl.db.IncrementQuoteLikes(uint(id))
 	if err != nil {
 		var statusCode int
-		if errors.Is(err, database.ErrQuoteNotFound) {
+		if errors.Is(err, db.ErrQuoteNotFound) {
 			statusCode = http.StatusNotFound
 		} else {
 			statusCode = http.StatusInternalServerError
@@ -121,7 +122,7 @@ func (ctrl *quotesController) dislikeQuote(w http.ResponseWriter, r *http.Reques
 	quote, err := ctrl.db.IncrementQuoteDislikes(uint(id))
 	if err != nil {
 		var statusCode int
-		if errors.Is(err, database.ErrQuoteNotFound) {
+		if errors.Is(err, db.ErrQuoteNotFound) {
 			statusCode = http.StatusNotFound
 		} else {
 			statusCode = http.StatusInternalServerError

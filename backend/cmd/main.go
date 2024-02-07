@@ -1,8 +1,9 @@
 package main
 
 import (
-	"backend/database"
+	"backend/db"
 	"backend/handlers"
+	"backend/middlewares"
 	"log"
 	"net/http"
 )
@@ -10,7 +11,7 @@ import (
 func main() {
 	var err error
 
-	db, err := database.New("db", "root", "root", "quotes", log.Default())
+	db, err := db.New("db", "root", "root", "quotes", log.Default())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -19,7 +20,12 @@ func main() {
 	http.Handle("/health/", http.StripPrefix("/health", handlers.HealthMux()))
 	http.Handle("/quotes/", http.StripPrefix("/quotes", handlers.QuotesMux(db)))
 
-	err = http.ListenAndServe(":8080", nil)
+	var handler http.Handler
+	handler = http.DefaultServeMux
+	handler = middlewares.Log(handler, log.Default())
+
+	log.Println("Server is running on port 8080")
+	err = http.ListenAndServe(":8080", handler)
 	if err != nil {
 		log.Fatal(err)
 	}

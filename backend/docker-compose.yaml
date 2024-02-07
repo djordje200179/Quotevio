@@ -8,22 +8,18 @@ networks:
 
 services:
     db:
-        image: mysql
-        environment:
-            MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: quotes
+        build:
+            context: .
+            dockerfile: ./db.Dockerfile
+            args:
+                DB_PASSWORD: root
         volumes:
             - db_data:/var/lib/mysql
         networks:
             - db_net
         ports:
             - "3306:3306"
-        healthcheck:
-            test: [ "CMD", "mysqladmin", "ping", "-uroot", "-proot" ]
-            interval: 3s
-            timeout: 3s
-            retries: 10
-    app:
+    api:
         build: .
         ports:
             - "8080:8080"
@@ -36,8 +32,3 @@ services:
             DB_USER: root
             DB_PASSWORD: root
             DB_NAME: quotes
-        healthcheck:
-            test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ping" ]
-            interval: 3s
-            timeout: 3s
-            retries: 10
