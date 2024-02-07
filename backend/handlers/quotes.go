@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"backend/db"
-	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
@@ -41,7 +40,6 @@ func (ctrl *quotesController) getQuotes(w http.ResponseWriter, _ *http.Request) 
 }
 
 const invalidQuoteID = "id must be an integer"
-const invalidBody = "invalid request body"
 
 func (ctrl *quotesController) getQuote(w http.ResponseWriter, r *http.Request) {
 	idRaw := r.PathValue("id")
@@ -66,17 +64,17 @@ func (ctrl *quotesController) getQuote(w http.ResponseWriter, r *http.Request) {
 
 func (ctrl *quotesController) createQuote(w http.ResponseWriter, r *http.Request) {
 	var quoteData struct {
-		Text   string `json:"text"`
-		Author string `json:"author"`
+		text   string
+		author string
 	}
 
-	err := json.NewDecoder(r.Body).Decode(&quoteData)
-	if err != nil || quoteData.Text == "" || quoteData.Author == "" {
-		http.Error(w, invalidBody, http.StatusBadRequest)
+	err := readBody(r, &quoteData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	quote, err := ctrl.db.CreateQuote(quoteData.Text, quoteData.Author)
+	quote, err := ctrl.db.CreateQuote(quoteData.text, quoteData.author)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

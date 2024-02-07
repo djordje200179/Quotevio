@@ -1,5 +1,6 @@
 POST http://localhost:8080/quotes/
 Content-Type: application/json
+Accept: application/json
 
 {
     "text": "Volim te",
