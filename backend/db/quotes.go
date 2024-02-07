@@ -7,13 +7,11 @@ import (
 )
 
 var ErrQuoteNotFound = errors.New("quote not found")
-var ErrSql = errors.New("sql error")
 
 func (db DB) readQuote(sc interface{ Scan(...interface{}) error }, quote *entities.Quote) error {
 	err := sc.Scan(&quote.Id, &quote.Text, &quote.Author, &quote.Likes, &quote.Dislikes, &quote.CreatedAt)
 	if err != nil {
-		db.logger.Println(err)
-		return errors.Join(err, ErrSql)
+		return err
 	}
 
 	return nil
@@ -29,8 +27,7 @@ func (db DB) getQuotesCount() (uint, error) {
 	var cnt uint
 	err := row.Scan(&cnt)
 	if err != nil {
-		db.logger.Println(err)
-		return 0, errors.Join(err, ErrSql)
+		return 0, err
 	}
 
 	return cnt, nil
@@ -43,14 +40,12 @@ func (db DB) CreateQuote(text, author string) (entities.Quote, error) {
     `
 	res, err := db.conn.Exec(stmt, text, author)
 	if err != nil {
-		db.logger.Println(err)
-		return entities.Quote{}, errors.Join(err, ErrSql)
+		return entities.Quote{}, err
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-		db.logger.Println(err)
-		return entities.Quote{}, errors.Join(err, ErrSql)
+		return entities.Quote{}, err
 	}
 
 	return db.GetQuote(uint(id))
@@ -68,10 +63,10 @@ func (db DB) GetQuote(id uint) (entities.Quote, error) {
 	err := db.readQuote(row, &quote)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return entities.Quote{}, ErrQuoteNotFound
-		} else {
-			return entities.Quote{}, err
+			err = ErrQuoteNotFound
 		}
+
+		return entities.Quote{}, err
 	}
 
 	return quote, nil
@@ -93,8 +88,7 @@ func (db DB) GetQuotes() ([]entities.Quote, error) {
 	`
 	rows, err := db.conn.Query(stmt)
 	if err != nil {
-		db.logger.Println(err)
-		return nil, errors.Join(err, ErrSql)
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -121,8 +115,7 @@ func (db DB) IncrementQuoteLikes(id uint) (entities.Quote, error) {
 
 	_, err := db.conn.Exec(stmt, id)
 	if err != nil {
-		db.logger.Println(err)
-		return entities.Quote{}, errors.Join(err, ErrSql)
+		return entities.Quote{}, err
 	}
 
 	return db.GetQuote(id)
@@ -137,8 +130,7 @@ func (db DB) IncrementQuoteDislikes(id uint) (entities.Quote, error) {
 
 	_, err := db.conn.Exec(stmt, id)
 	if err != nil {
-		db.logger.Println(err)
-		return entities.Quote{}, errors.Join(err, ErrSql)
+		return entities.Quote{}, err
 	}
 
 	return db.GetQuote(id)

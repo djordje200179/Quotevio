@@ -20,3 +20,7 @@ func returnJSON(w http.ResponseWriter, statusCode int, data any) {
 		panic(err)
 	}
 }
+
+func NotFound(w http.ResponseWriter, _ *http.Request) {
+	returnString(w, http.StatusNotFound, "not Found")
+}

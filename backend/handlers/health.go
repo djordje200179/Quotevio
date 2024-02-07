@@ -6,11 +6,11 @@ import (
 	"time"
 )
 
-func ping(w http.ResponseWriter, r *http.Request) {
+func ping(w http.ResponseWriter, _ *http.Request) {
 	returnString(w, http.StatusOK, "pong")
 }
 
-func timestamp(w http.ResponseWriter, r *http.Request) {
+func timestamp(w http.ResponseWriter, _ *http.Request) {
 	unixTime := time.Now().UnixMilli()
 
 	returnString(w, http.StatusOK, strconv.Itoa(int(unixTime)))

@@ -10,6 +10,7 @@ import (
 
 type quotesController struct {
 	db db.DB
+
 	*http.ServeMux
 }
 
@@ -20,16 +21,16 @@ func QuotesMux(db db.DB) *http.ServeMux {
 		ServeMux: http.NewServeMux(),
 	}
 
-	ctrl.HandleFunc("GET /", ctrl.getAllQuotes)
+	ctrl.HandleFunc("GET /", ctrl.getQuotes)
 	ctrl.HandleFunc("GET /{id}", ctrl.getQuote)
-	ctrl.HandleFunc("POST /", ctrl.addQuote)
+	ctrl.HandleFunc("POST /", ctrl.createQuote)
 	ctrl.HandleFunc("POST /{id}/like", ctrl.likeQuote)
 	ctrl.HandleFunc("POST /{id}/dislike", ctrl.dislikeQuote)
 
 	return ctrl.ServeMux
 }
 
-func (ctrl *quotesController) getAllQuotes(w http.ResponseWriter, r *http.Request) {
+func (ctrl *quotesController) getQuotes(w http.ResponseWriter, _ *http.Request) {
 	quotes, err := ctrl.db.GetQuotes()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -66,7 +67,7 @@ func (ctrl *quotesController) getQuote(w http.ResponseWriter, r *http.Request) {
 	returnJSON(w, http.StatusOK, quote)
 }
 
-func (ctrl *quotesController) addQuote(w http.ResponseWriter, r *http.Request) {
+func (ctrl *quotesController) createQuote(w http.ResponseWriter, r *http.Request) {
 	var quoteData struct {
 		Text   string `json:"text"`
 		Author string `json:"author"`

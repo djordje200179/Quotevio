@@ -8,11 +8,10 @@ import (
 )
 
 type DB struct {
-	conn   *sql.DB
-	logger *log.Logger
+	conn *sql.DB
 }
 
-func New(host, username, password, dbName string, logger *log.Logger) (DB, error) {
+func New(host, username, password, dbName string) (DB, error) {
 	var err error
 
 	dsn := fmt.Sprintf(
@@ -24,12 +23,12 @@ func New(host, username, password, dbName string, logger *log.Logger) (DB, error
 		return DB{}, err
 	}
 
-	return DB{conn, logger}, nil
+	return DB{conn}, nil
 }
 
 func (db DB) Close() {
 	err := db.conn.Close()
 	if err != nil {
-		db.logger.Println(err)
+		log.Fatal(err)
 	}
 }
