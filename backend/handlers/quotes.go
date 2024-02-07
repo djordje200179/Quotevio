@@ -64,8 +64,8 @@ func (ctrl *quotesController) getQuote(w http.ResponseWriter, r *http.Request) {
 
 func (ctrl *quotesController) createQuote(w http.ResponseWriter, r *http.Request) {
 	var quoteData struct {
-		text   string
-		author string
+		Text   string `json:"text"`
+		Author string `json:"author"`
 	}
 
 	err := readBody(r, &quoteData)
@@ -74,7 +74,12 @@ func (ctrl *quotesController) createQuote(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	quote, err := ctrl.db.CreateQuote(quoteData.text, quoteData.author)
+	if quoteData.Text == "" || quoteData.Author == "" {
+		http.Error(w, "text and author are required", http.StatusBadRequest)
+		return
+	}
+
+	quote, err := ctrl.db.CreateQuote(quoteData.Text, quoteData.Author)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
