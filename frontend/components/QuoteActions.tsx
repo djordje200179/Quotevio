@@ -31,7 +31,7 @@ export default function QuoteActions({ quote, onQuoteUpdate }: Props) {
 	function like() {
 		const url = `${process.env.EXPO_PUBLIC_API_URL}/quotes/${quote.id}/like`;
 
-		fetch(url, { method: "POST" })
+		fetch(url, { method: "PATCH" })
 			.then(response=>response.json())
 			.then((newQuote:Quote) => {
 				newQuote.liked = true;
@@ -43,7 +43,7 @@ export default function QuoteActions({ quote, onQuoteUpdate }: Props) {
 	function dislike() {
 		const url = `${process.env.EXPO_PUBLIC_API_URL}/quotes/${quote.id}/dislike`;
 
-		fetch(url, { method: "POST" })
+		fetch(url, { method: "PATCH" })
 			.then(response=>response.json())
 			.then((newQuote:Quote) => {
 				newQuote.disliked = true;

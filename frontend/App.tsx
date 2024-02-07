@@ -29,7 +29,7 @@ export default function App() {
 	}
 
 	function loadData() {
-		const url = `${process.env.EXPO_PUBLIC_API_URL}/quotes`;
+		const url = `${process.env.EXPO_PUBLIC_API_URL}/quotes/`;
 		console.log(`Loading data from ${url}`);
 
 		fetch(url)
