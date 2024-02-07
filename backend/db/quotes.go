@@ -9,7 +9,7 @@ import (
 var ErrQuoteNotFound = errors.New("quote not found")
 
 func (db DB) readQuote(sc interface{ Scan(...interface{}) error }, quote *entities.Quote) error {
-	err := sc.Scan(&quote.Id, &quote.Text, &quote.Author, &quote.Likes, &quote.Dislikes, &quote.CreatedAt)
+	err := sc.Scan(&quote.Id, &quote.Text, &quote.Author, &quote.CreatedAt, &quote.Likes, &quote.Dislikes)
 	if err != nil {
 		return err
 	}
