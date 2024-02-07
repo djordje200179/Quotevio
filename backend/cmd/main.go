@@ -19,7 +19,6 @@ func main() {
 
 	http.Handle("/health/", http.StripPrefix("/health", handlers.HealthMux()))
 	http.Handle("/quotes/", http.StripPrefix("/quotes", handlers.QuotesMux(db)))
-	http.HandleFunc("/", handlers.NotFound)
 
 	log.Println("Server is running on port 8080")
 	err = http.ListenAndServe(

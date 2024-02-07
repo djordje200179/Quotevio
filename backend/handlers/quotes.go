@@ -53,14 +53,11 @@ func (ctrl *quotesController) getQuote(w http.ResponseWriter, r *http.Request) {
 
 	quote, err := ctrl.db.GetQuote(uint(id))
 	if err != nil {
-		var statusCode int
 		if errors.Is(err, db.ErrQuoteNotFound) {
-			statusCode = http.StatusNotFound
+			http.NotFound(w, r)
 		} else {
-			statusCode = http.StatusInternalServerError
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-
-		http.Error(w, err.Error(), statusCode)
 		return
 	}
 
@@ -98,14 +95,12 @@ func (ctrl *quotesController) likeQuote(w http.ResponseWriter, r *http.Request) 
 
 	quote, err := ctrl.db.IncrementQuoteLikes(uint(id))
 	if err != nil {
-		var statusCode int
 		if errors.Is(err, db.ErrQuoteNotFound) {
-			statusCode = http.StatusNotFound
+			http.NotFound(w, r)
 		} else {
-			statusCode = http.StatusInternalServerError
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
-		http.Error(w, err.Error(), statusCode)
 		return
 	}
 
@@ -122,14 +117,12 @@ func (ctrl *quotesController) dislikeQuote(w http.ResponseWriter, r *http.Reques
 
 	quote, err := ctrl.db.IncrementQuoteDislikes(uint(id))
 	if err != nil {
-		var statusCode int
 		if errors.Is(err, db.ErrQuoteNotFound) {
-			statusCode = http.StatusNotFound
+			http.NotFound(w, r)
 		} else {
-			statusCode = http.StatusInternalServerError
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
-		http.Error(w, err.Error(), statusCode)
 		return
 	}
 

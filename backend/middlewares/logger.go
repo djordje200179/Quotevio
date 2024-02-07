@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"os"
 	"slices"
+	"strconv"
+	"strings"
 )
 
 type logger struct {
@@ -44,10 +46,25 @@ func (l logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	response := &responseRecorder{ResponseWriter: w}
 	l.next.ServeHTTP(response, r)
 
-	switch response.status % 100 {
+	statusGroup := response.status / 100
+	switch statusGroup {
+	case 2, 3:
+		return
 	case 4:
-		l.stdOut.Println(response.status, string(response.body))
+		l.stdOut.Println(makeResponseMessage(response.status, response.body))
 	case 5:
-		l.stdErr.Println(response.status, string(response.body))
+		l.stdErr.Println(makeResponseMessage(response.status, response.body))
 	}
+}
+
+func makeResponseMessage(statusCode int, body []byte) string {
+	var sb strings.Builder
+
+	sb.WriteByte('(')
+	sb.WriteString(strconv.Itoa(statusCode))
+	sb.WriteByte(')')
+	sb.WriteByte(' ')
+	sb.Write(body)
+
+	return sb.String()
 }
