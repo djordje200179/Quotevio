@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default function QuoteItem({ quote, onQuoteUpdate }: Props) {
+export default function QuoteView({ quote, onQuoteUpdate }: Props) {
 	return (
 		<Card style={styles.card}>
 			<Card.Content>

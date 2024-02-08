@@ -28,38 +28,34 @@ const styles = StyleSheet.create({
 });
 
 export default function QuoteActions({ quote, onQuoteUpdate }: Props) {
-	function like() {
+	async function like() {
 		const url = `${process.env.EXPO_PUBLIC_API_URL}/quotes/${quote.id}/like`;
 
-		fetch(url, { method: "PATCH" })
-			.then(response=>response.json())
-			.then((newQuote:Quote) => {
-				newQuote.liked = true;
-				onQuoteUpdate(newQuote);
-			})
-			.catch(console.error);
+		const response = await fetch(url, { method: "PATCH" });
+		const newQuote: Quote = await response.json();
+
+		newQuote.liked = true;
+		onQuoteUpdate(newQuote);
 	}
 
-	function dislike() {
+	async function dislike() {
 		const url = `${process.env.EXPO_PUBLIC_API_URL}/quotes/${quote.id}/dislike`;
 
-		fetch(url, { method: "PATCH" })
-			.then(response=>response.json())
-			.then((newQuote:Quote) => {
-				newQuote.disliked = true;
-				onQuoteUpdate(newQuote);
-			})
-			.catch(console.error);
+		const response = await fetch(url, { method: "PATCH" });
+		const newQuote: Quote = await response.json();
+
+		newQuote.disliked = true;
+		onQuoteUpdate(newQuote);
 	}
 
 	return (
 		<View style={styles.container}>
-			<Chip icon="thumb-up" onPress={like} selected showSelectedOverlay
+			<Chip icon="thumb-up" onPress={like} disabled={quote.liked} selected={quote.liked}
 				  textStyle={styles.actionText} style={styles.likesContainer}>
 				{quote.likes}
 			</Chip>
 
-			<Chip icon="thumb-down" onPress={dislike} selected={quote.disliked}
+			<Chip icon="thumb-down" onPress={dislike} disabled={quote.disliked} selected={quote.disliked}
 			      textStyle={styles.actionText} style={styles.dislikesContainer}>
 				{quote.dislikes}
 			</Chip>
