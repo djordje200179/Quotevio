@@ -1,8 +1,9 @@
-import {ActivityIndicator, FlatList, RefreshControl, SafeAreaView, StyleSheet} from "react-native";
-import {FAB, MD3LightTheme as DefaultTheme, Searchbar} from "react-native-paper";
+import {FlatList, RefreshControl, SafeAreaView, StyleSheet} from "react-native";
+import {FAB, MD3LightTheme as DefaultTheme, Searchbar, ActivityIndicator} from "react-native-paper";
 import {useMemo, useState} from "react";
 import {useQuotes} from "../hooks/useQuotes";
 import QuoteView from "../components/QuoteView";
+import {useRouter} from 'expo-router';
 
 const styles = StyleSheet.create({
 	container: {
@@ -30,6 +31,8 @@ export default function Index() {
 		[searchQuery, allQuotes]
 	);
 
+	const router = useRouter();
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<Searchbar placeholder="Search quotes" style={styles.searchBar}
@@ -45,7 +48,7 @@ export default function Index() {
 
 			<FAB icon="plus" color={DefaultTheme.colors.inversePrimary}
 			     size="medium" style={styles.fab}
-			     onPress={() => console.log("Pressed")}
+			     onPress={() => router.push("new_quote")}
 			/>
 		</SafeAreaView>
 	);
