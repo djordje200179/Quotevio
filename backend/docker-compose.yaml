@@ -5,30 +5,57 @@ volumes:
 
 networks:
     db_net:
+    redis_net:
 
 services:
     db:
         build:
             context: .
             dockerfile: ./db.Dockerfile
-            args:
-                DB_PASSWORD: root
         volumes:
             - db_data:/var/lib/mysql
         networks:
             - db_net
+        environment:
+            MYSQL_DATABASE: quotes
+            MYSQL_ROOT_PASSWORD: root
+        healthcheck:
+            test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+            interval: 1s
+            timeout: 3s
+            retries: 30
         ports:
             - "3306:3306"
+    redis:
+        image: "redis:alpine"
+        networks:
+            - redis_net
+        healthcheck:
+            test: [ "CMD", "redis-cli", "ping" ]
+            interval: 1s
+            timeout: 3s
+            retries: 30
+        ports:
+            - "6379:6379"
     api:
         build: .
         ports:
             - "8080:8080"
         networks:
             - db_net
+            - redis_net
         depends_on:
             - db
+            - redis
         environment:
             DB_HOST: db
             DB_USER: root
             DB_PASSWORD: root
             DB_NAME: quotes
+
+            REDIS_HOST: "redis:6379"
+        healthcheck:
+            test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ping" ]
+            interval: 1s
+            timeout: 3s
+            retries: 30

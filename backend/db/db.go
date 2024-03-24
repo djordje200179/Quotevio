@@ -5,25 +5,27 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"os"
 )
 
 type DB struct {
 	conn *sql.DB
 }
 
-func New(host, username, password, dbName string) (DB, error) {
+func Init() DB {
 	var err error
 
 	dsn := fmt.Sprintf(
 		"%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local",
-		username, password, host, dbName,
+		os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_HOST"), os.Getenv("DB_NAME"),
 	)
 	conn, err := sql.Open("mysql", dsn)
 	if err != nil {
-		return DB{}, err
+		panic(err)
 	}
 
-	return DB{conn}, nil
+	return DB{conn: conn}
 }
 
 func (db DB) Close() {
